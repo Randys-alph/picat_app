@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:day_night_switcher/day_night_switcher.dart';
 import '../theme_provider.dart';
 import 'search_screen.dart';
 import 'splash_screen.dart';
@@ -11,7 +12,6 @@ import 'splash_screen.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  // Fungsi untuk navigasi ke halaman Search dengan transisi
   void navigateToSearch(BuildContext context, String category) {
     Navigator.push(
       context,
@@ -22,7 +22,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Fungsi untuk navigasi kembali ke Splash Screen dengan transisi
   void navigateToSplash(BuildContext context) {
     Navigator.pushAndRemoveUntil(
       context,
@@ -38,145 +37,120 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-    final buttonTextColor = isDarkMode ? Colors.white : Colors.black;
-    final logoImage = isDarkMode ? 'assets/images/dark_logo.png' : 'assets/images/logo.png';
+    final logoImage = isDarkMode ? 'assets/images/logo_dark.png' : 'assets/images/logo_light.png';
+    final gradientImage = isDarkMode
+        ? 'assets/images/gradient_dark.png'
+        : 'assets/images/gradient_light.png';
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: GestureDetector(
-          onTap: () => navigateToSplash(context),
-          child: Text(
-            'PiCat',
-            style: TextStyle(
-              fontFamily: 'Jersey20',
-              fontSize: 40,
-              color: isDarkMode ? Colors.white : Colors.black,
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(gradientImage),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-        ),
-        actions: [
-          CupertinoSwitch(
-            value: isDarkMode,
-            onChanged: (value) {
-              final provider = Provider.of<ThemeProvider>(context, listen: false);
-              provider.toggleTheme(value);
-            },
-            activeColor: Colors.orange,
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
-      body: Stack(
-        children: [
-          // Gambar latar belakang di pojok kiri atas
+
           Positioned(
-            top: -50,
+            top: -20,
             left: -50,
             child: Transform.rotate(
-              angle: pi, // Memutar gambar 180 derajat
+              angle: 150 * (pi / 180),
               child: Image.asset(
                 logoImage,
-                width: 250,
-                color: const Color.fromRGBO(255, 255, 255, 0.2),
+                width: 300,
+                color: const Color.fromRGBO(255, 255, 255, 0.1),
                 colorBlendMode: BlendMode.modulate,
               ),
             ),
           ),
-          // Gambar latar belakang di pojok kanan bawah
           Positioned(
             bottom: -80,
-            right: -60,
+            right: -25,
             child: Image.asset(
               logoImage,
-              width: 250,
-              color: const Color.fromRGBO(255, 255, 255, 0.2),
+              width: 300,
+              color: const Color.fromRGBO(255, 255, 255, 0.1),
               colorBlendMode: BlendMode.modulate,
             ),
           ),
 
-          // Konten Utama (Tombol Kategori)
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Tombol Movies dengan animasi
-                  FadeInLeft(
-                    delay: const Duration(milliseconds: 200),
-                    child: ElevatedButton(
-                      onPressed: () => navigateToSearch(context, 'Movie'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isDarkMode ? Colors.grey.shade800.withOpacity(0.5) : Colors.white.withOpacity(0.7),
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () => navigateToSplash(context),
+                        child: Text(
+                          'PiCat',
+                          style: TextStyle(
+                            fontFamily: 'Jersey20',
+                            fontSize: 40,
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
                         ),
                       ),
-                      child: Text(
-                        'Movie',
-                        style: TextStyle(
-                          fontFamily: 'Jersey20',
-                          fontSize: 40,
-                          color: buttonTextColor,
-                        ),
+                      DayNightSwitcher(
+                        isDarkModeEnabled: isDarkMode,
+                        onStateChanged: (bool isDarkModeEnabled) {
+                          final provider = Provider.of<ThemeProvider>(context, listen: false);
+                          provider.toggleTheme(isDarkModeEnabled);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                
+                Expanded(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          FadeInLeft(
+                            delay: const Duration(milliseconds: 200),
+                            child: CategoryButton(
+                              label: 'Movie',
+                              imageName: 'movie_cat',
+                              onPressed: () => navigateToSearch(context, 'Movie'),
+                            ),
+                          ),
+                          const SizedBox(height: 25),
+                          FadeInLeft(
+                            delay: const Duration(milliseconds: 400),
+                            child: CategoryButton(
+                              label: 'Music',
+                              imageName: 'music_cat',
+                              onPressed: () => navigateToSearch(context, 'Music'),
+                              isImageLeft: true,
+                            ),
+                          ),
+                          const SizedBox(height: 25),
+                          FadeInLeft(
+                            delay: const Duration(milliseconds: 600),
+                            child: CategoryButton(
+                              label: 'Book',
+                              imageName: 'book_cat',
+                              onPressed: () => navigateToSearch(context, 'Book'),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 25),
-
-                  // Tombol Music dengan animasi
-                  FadeInLeft(
-                    delay: const Duration(milliseconds: 400),
-                    child: ElevatedButton(
-                      onPressed: () => navigateToSearch(context, 'Music'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isDarkMode ? Colors.grey.shade800.withOpacity(0.5) : Colors.white.withOpacity(0.7),
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                      ),
-                      child: Text(
-                        'Music',
-                        style: TextStyle(
-                          fontFamily: 'Jersey20',
-                          fontSize: 40,
-                          color: buttonTextColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-
-                  // Tombol Books dengan animasi
-                  FadeInLeft(
-                    delay: const Duration(milliseconds: 600),
-                    child: ElevatedButton(
-                      onPressed: () => navigateToSearch(context, 'Book'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isDarkMode ? Colors.grey.shade800.withOpacity(0.5) : Colors.white.withOpacity(0.7),
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                      ),
-                      child: Text(
-                        'Book',
-                        style: TextStyle(
-                          fontFamily: 'Jersey20',
-                          fontSize: 40,
-                          color: buttonTextColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -184,3 +158,63 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+
+class CategoryButton extends StatelessWidget {
+  final String label;
+  final String imageName;
+  final VoidCallback onPressed;
+  final bool isImageLeft;
+
+  const CategoryButton({
+    super.key,
+    required this.label,
+    required this.imageName,
+    required this.onPressed,
+    this.isImageLeft = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+    final buttonTextColor = isDarkMode ? Colors.white : Colors.black;
+    final fullImagePath = isDarkMode
+        ? 'assets/images/${imageName}_dark.png'
+        : 'assets/images/${imageName}_light.png';
+
+    final textWidget = Text(
+      label,
+      style: TextStyle(
+        fontFamily: 'Jersey20',
+        fontSize: 45,
+        color: buttonTextColor,
+      ),
+    );
+
+    final imageWidget = Image.asset(
+      fullImagePath,
+      height: 98,
+      fit: BoxFit.contain,
+    );
+
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isDarkMode ? Colors.grey.shade800.withOpacity(0.5) : Colors.white.withOpacity(0.7),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(40),
+        ),
+        elevation: 5,
+      ),
+      child: SizedBox(
+        height: 110,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: isImageLeft ? [imageWidget, textWidget] : [textWidget, imageWidget],
+        ),
+      ),
+    );
+  }
+}
+

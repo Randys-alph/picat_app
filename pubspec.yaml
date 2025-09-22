@@ -39,6 +39,7 @@ dependencies:
   animate_do: ^4.2.0
   flutter_animate: ^4.5.2
   page_transition: ^2.2.1
+  day_night_switcher: ^0.2.0+1
 
 dev_dependencies:
   flutter_test:

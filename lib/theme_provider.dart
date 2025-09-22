@@ -9,6 +9,6 @@ class ThemeProvider extends ChangeNotifier {
 
   void toggleTheme(bool isOn) {
     _themeMode = isOn ? ThemeMode.dark : ThemeMode.light;
-    notifyListeners(); // Memberitahu semua widget untuk update
+    notifyListeners();
   }
 }

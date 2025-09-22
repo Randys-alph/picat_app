@@ -17,19 +17,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 'Consumer' akan otomatis rebuild MaterialApp saat tema berubah
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return MaterialApp(
           title: 'PiCat',
-          themeMode: themeProvider.themeMode, // Menggunakan theme mode dari provider
-          // Tema untuk Light Mode
+          themeMode: themeProvider.themeMode,
           theme: ThemeData(
             brightness: Brightness.light,
             scaffoldBackgroundColor: Colors.white,
             primarySwatch: Colors.orange,
           ),
-          // Tema untuk Dark Mode
           darkTheme: ThemeData(
             brightness: Brightness.dark,
             scaffoldBackgroundColor: Colors.black,
